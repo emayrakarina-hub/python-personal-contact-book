@@ -1,0 +1,115 @@
+
+
+### CONTACT BOOK ###
+
+class Contact:
+    def __init__(self, name, phone, email):
+        self.name = name
+        self.phone = phone
+        self.email = email
+
+    def __str__(self):
+        return f"{self.name} | {self.phone} | {self.email}"
+
+
+class ContactBook:
+    def __init__(self):
+        self.categories = {
+            'family': [],
+            'friends': [],
+            'work': []
+        }
+
+    def add_contact(self, name, phone, email, category):
+        category = category.lower()
+        if category not in self.categories:
+            print('Invalid Category. Choose: family, friends, work')
+            return
+
+        new_contact = Contact(name, phone, email)
+        self.categories[category].append(new_contact)
+        print(f'Added {name} to {category}')
+
+    def search_contact(self, name):
+        results = []
+        for category, contacts in self.categories.items():   # fixed typo: catefories → categories
+            for c in contacts:
+                if name.lower() in c.name.lower():
+                    results.append((category, c))
+        return results
+
+    def update_contact(self, name, new_phone=None, new_email=None, new_category=None):
+        results = self.search_contact(name)
+        if not results:
+            print('No Contact Found.')
+            return
+
+        category, contact = results[0]
+
+        if new_phone:
+            contact.phone = new_phone
+        if new_email:
+            contact.email = new_email
+
+        if new_category:
+            new_category = new_category.lower()
+            if new_category not in self.categories:
+                print('Invalid New Category')
+            else:
+                self.categories[category].remove(contact)
+                self.categories[new_category].append(contact)
+
+        print(f'Updated: {contact.name}')
+
+    def delete_contact(self, name):
+        results = self.search_contact(name)
+        if not results:
+            print('No Contact Found')
+            return
+
+        category, contact = results[0]
+        self.categories[category].remove(contact)
+        print(f'Deleted: {contact.name}')
+
+    def list_category(self, category):
+        category = category.lower()
+        if category not in self.categories:
+            print('Invalid Category.')
+            return
+
+        return self.categories[category]
+
+    def show_all(self):
+        for category, contacts in self.categories.items():
+            print(f'\n--- {category.upper()} ---')
+            for c in contacts:
+                print(c)
+
+
+### USING THE CONTACT BOOK ###
+
+book = ContactBook()
+
+### FAMILY ###
+book.add_contact('Samantha Garcia', '346-894-0093', 'none', 'family')
+book.add_contact('Aaron Garcia', '346-774-6892', 'none', 'family')
+book.add_contact('Carlos Garcia', '346-892-3581', 'none', 'family')
+
+### FRIENDS ###
+book.add_contact('Jose Rodriguez', '346-748-9002', 'none', 'friends')
+book.add_contact('Maria Lara', '346-776-4923', 'none', 'friends')
+
+### WORK ###
+book.add_contact('Veronica Lopez', '832-456-8332', 'vlopez@gmail.com', 'work')
+book.add_contact('Katherine Ortiz', '832-900-3892', 'OrtizKathrine@gmail.com', 'work')
+
+print('\nSearch for Katherine Ortiz')
+for cat, c in book.search_contact('Katherine Ortiz'):
+    print(f'{cat}: {c}')
+
+print('\nFriends:')
+for c in book.list_category('friends'):
+    print(c)
+
+print('\nAll Contacts:')
+book.show_all()
